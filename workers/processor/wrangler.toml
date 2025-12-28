@@ -1,0 +1,23 @@
+name = "mygrowth-processor"
+main = "src/index.ts"
+compatibility_date = "2024-12-28"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "mygrowth"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "mygrowth-content"
+
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "mygrowth-vectors"
+
+[ai]
+binding = "AI"
+
+[[services]]
+binding = "API_GATEWAY"
+service = "mygrowth-api-gateway"

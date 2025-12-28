@@ -1,0 +1,36 @@
+name = "mygrowth-api-gateway"
+main = "src/index.ts"
+compatibility_date = "2024-12-28"
+
+[vars]
+# Generate with: openssl rand -base64 32
+AI_ENCRYPTION_KEY = "REPLACE_WITH_BASE64_32_BYTES_KEY"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "mygrowth"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "mygrowth-content"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[[kv_namespaces]]
+binding = "AI_CONFIG"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "mygrowth-vectors"
+
+[ai]
+binding = "AI"
+
+# Service bindings for internal communication
+[[services]]
+binding = "PROCESSOR"
+service = "mygrowth-processor"
