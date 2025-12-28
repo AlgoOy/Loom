@@ -1,23 +1,23 @@
-name = "mygrowth-processor"
+name = "loom-processor"
 main = "src/index.ts"
 compatibility_date = "2024-12-28"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "mygrowth"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_name = "loom-db"
+database_id = "005a7ba7-e776-416d-b8be-4638144e86c2"
 
 [[r2_buckets]]
 binding = "R2"
-bucket_name = "mygrowth-content"
+bucket_name = "loom-content"
 
 [[vectorize]]
 binding = "VECTORIZE"
-index_name = "mygrowth-vectors"
+index_name = "loom-vectors"
 
 [ai]
 binding = "AI"
 
 [[services]]
 binding = "API_GATEWAY"
-service = "mygrowth-api-gateway"
+service = "loom-api-gateway"
