@@ -13,14 +13,17 @@ database_id = "005a7ba7-e776-416d-b8be-4638144e86c2"
 [[r2_buckets]]
 binding = "R2"
 bucket_name = "loom-content"
+preview_bucket_name = "loom-content-preview"
 
 [[kv_namespaces]]
 binding = "CACHE"
 id = "9fba16b1cb2a47779283a89647a131ce"
+preview_id = "89aef129fb5d4ddba57fc1affd608056"
 
 [[kv_namespaces]]
 binding = "AI_CONFIG"
 id = "14c65b75f9e54ffd86e1bc4a216dd38b"
+preview_id = "fe796d1672e84206b5d47464a3b37885"
 
 [[vectorize]]
 binding = "VECTORIZE"

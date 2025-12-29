@@ -1,0 +1,19 @@
+{
+  "name": "loom",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:frontend\"",
+    "dev:api": "cd workers/api-gateway && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:local": "concurrently \"npm run dev:api:local\" \"npm run dev:frontend\"",
+    "dev:api:local": "cd workers/api-gateway && npm run dev:local",
+    "build": "cd frontend && npm run build",
+    "deploy": "npm run deploy:workers && npm run deploy:frontend",
+    "deploy:workers": "cd workers/api-gateway && npm run deploy && cd ../processor && npm run deploy && cd ../scheduler && npm run deploy",
+    "deploy:frontend": "cd frontend && npm run build",
+    "db:init": "cd workers/api-gateway && npx wrangler d1 execute loom-db --local --file=../schema.sql"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
