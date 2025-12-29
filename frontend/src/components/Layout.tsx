@@ -1,21 +1,28 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Radio, FileText, Settings, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Radio, FileText, Settings, Menu, X, LogOut } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
-const navItems = [
+const publicNavItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/sources', icon: Radio, label: 'Sources' },
   { to: '/reports', icon: FileText, label: 'Reports' },
+];
+
+const adminNavItems = [
+  { to: '/sources', icon: Radio, label: 'Sources' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 export default function Layout() {
+  const { isAdmin, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
+
+  const navItems = isAdmin ? [...publicNavItems, ...adminNavItems] : publicNavItems;
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-background text-gray-900 dark:text-gray-100 flex">
@@ -33,7 +40,7 @@ export default function Layout() {
       >
         <div className="h-16 flex items-center justify-between px-6 border-b border-gray-200 dark:border-gray-700">
           <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            MyGrowth Radar
+            Loom
           </h1>
           <button onClick={() => setSidebarOpen(false)} className="md:hidden">
             <X className="w-6 h-6" />
@@ -58,6 +65,29 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
+
+        {isAdmin && (
+          <div className="absolute bottom-4 left-4 right-4">
+            <button
+              onClick={logout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium">Logout</span>
+            </button>
+          </div>
+        )}
+
+        {!isAdmin && (
+          <div className="absolute bottom-4 left-4 right-4">
+            <NavLink
+              to="/login"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+            >
+              <span className="font-medium">Admin Login</span>
+            </NavLink>
+          </div>
+        )}
       </aside>
 
       <main className="flex-1 md:ml-64 flex flex-col min-h-screen">
@@ -69,6 +99,11 @@ export default function Layout() {
             <Menu className="w-6 h-6" />
           </button>
           <div className="flex-1" />
+          {isAdmin && (
+            <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded mr-2">
+              Admin
+            </span>
+          )}
           <button
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-sm"

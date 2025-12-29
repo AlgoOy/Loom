@@ -7,6 +7,7 @@ export interface Env {
   VECTORIZE: VectorizeIndex;
   AI: Ai;
   AI_ENCRYPTION_KEY: string;
+  ADMIN_PASSWORD: string;
   PROCESSOR?: Fetcher;
   API_GATEWAY?: Fetcher;
 }

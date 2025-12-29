@@ -5,7 +5,8 @@ import { encrypt, decrypt } from './services/encryption';
 import { callAI } from './services/ai-router';
 import { analyzeThreePillar } from './services/three-pillar';
 
-const app = new Hono<{ Bindings: Env }>();
+type Variables = { isAdmin: boolean };
+const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
 app.use('/*', cors({
   origin: ['https://algooy.github.io', 'http://localhost:3000', 'http://localhost:5173'],
@@ -14,11 +15,35 @@ app.use('/*', cors({
   credentials: true,
 }));
 
+// Admin authentication middleware
+app.use('/api/*', async (c, next) => {
+  const authHeader = c.req.header('Authorization');
+  const password = authHeader?.replace('Bearer ', '');
+  c.set('isAdmin', password === c.env.ADMIN_PASSWORD);
+  await next();
+});
+
+// Helper to require admin
+function requireAdmin(c: any): Response | null {
+  if (!c.get('isAdmin')) {
+    return c.json({ error: 'Unauthorized' }, 401);
+  }
+  return null;
+}
+
+// Auth check endpoint
+app.post('/api/auth', (c) => {
+  return c.json({ authenticated: c.get('isAdmin') });
+});
+
 // Health check
 app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: Date.now() }));
 
 // Sources CRUD
 app.post('/api/sources', async (c) => {
+  const denied = requireAdmin(c);
+  if (denied) return denied;
+
   const body = await c.req.json();
   if (!body.url || !body.type || !body.name) {
     return c.json({ error: 'Missing required fields' }, 400);
@@ -54,11 +79,17 @@ app.post('/api/sources', async (c) => {
 });
 
 app.get('/api/sources', async (c) => {
+  const denied = requireAdmin(c);
+  if (denied) return denied;
+
   const { results } = await c.env.DB.prepare('SELECT * FROM sources ORDER BY created_at DESC').all();
   return c.json({ sources: results });
 });
 
 app.delete('/api/sources/:id', async (c) => {
+  const denied = requireAdmin(c);
+  if (denied) return denied;
+
   const id = c.req.param('id');
   await c.env.DB.prepare('DELETE FROM sources WHERE id = ?1').bind(id).run();
   return c.json({ ok: true });
@@ -91,8 +122,11 @@ app.get('/api/insights', async (c) => {
   return c.json({ insights });
 });
 
-// Chat / RAG Search
+// Chat / RAG Search (admin only - consumes AI tokens)
 app.post('/api/chat', async (c) => {
+  const denied = requireAdmin(c);
+  if (denied) return denied;
+
   const body = await c.req.json();
   if (!body.query) return c.json({ error: 'Missing query' }, 400);
 
@@ -163,8 +197,11 @@ app.get('/api/reports/:type', async (c) => {
   return c.json({ reports: results });
 });
 
-// Settings
+// Settings (admin only)
 app.post('/api/settings', async (c) => {
+  const denied = requireAdmin(c);
+  if (denied) return denied;
+
   const body = await c.req.json();
   if (!body.provider || !body.model || !body.api_key) {
     return c.json({ error: 'Missing required fields' }, 400);
@@ -186,6 +223,9 @@ app.post('/api/settings', async (c) => {
 });
 
 app.get('/api/settings', async (c) => {
+  const denied = requireAdmin(c);
+  if (denied) return denied;
+
   const stored = await c.env.AI_CONFIG.get('config', 'json') as AIConfig | null;
   if (!stored) return c.json({ configured: false });
   return c.json({
